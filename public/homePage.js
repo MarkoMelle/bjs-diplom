@@ -35,6 +35,7 @@ ratesBoardUpdate();
 
 setInterval(() => ratesBoardUpdate(), 60000);
 
+//Операции с деньгами
 
 const moneyManager = new MoneyManager();
 
@@ -69,6 +70,46 @@ moneyManager.sendMoneyCallback = function (data) {
          moneyManager.setMessage(false, response.error);
       }
    })
-}
+};
 
+//Работа с избранным
 
+let favoritesWidget = new FavoritesWidget();
+
+function favoritesUpdate() {
+   ApiConnector.getFavorites(response => {
+      if (response.success) {
+         favoritesWidget.clearTable();
+         favoritesWidget.fillTable(response.data);
+         moneyManager.updateUsersList(response.data);
+      };
+   });
+};
+
+favoritesUpdate();
+
+favoritesWidget.addUserCallback = function (data) {
+   ApiConnector.addUserToFavorites(data, response => {
+      if (response.success) {
+         favoritesWidget.clearTable();
+         favoritesWidget.fillTable(response.data);
+         moneyManager.updateUsersList(response.data);
+         favoritesWidget.setMessage(true, 'Успешно');
+      } else {
+         favoritesWidget.setMessage(false, response.error);
+      };
+   })
+};
+
+favoritesWidget.removeUserCallback = function (data) {
+   ApiConnector.removeUserFromFavorites(data, response => {
+      if (response.success) {
+         favoritesWidget.clearTable();
+         favoritesWidget.fillTable(response.data);
+         moneyManager.updateUsersList(response.data);
+         favoritesWidget.setMessage(true, 'Успешно');
+      } else {
+         favoritesWidget.setMessage(false, response.error);
+      };
+   })
+};
